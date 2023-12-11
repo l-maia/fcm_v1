@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use serde::Serialize;
 
-use crate::{auth::Authenticator, message::Message, Error, Result};
+use crate::{auth::Authenticator, message::Message, result::FCMError, Error, Result};
 
 /// FCM HTTP v1 API client
 #[derive(Clone)]
@@ -78,12 +78,10 @@ impl Client {
 
         if let Err(e) = resp.error_for_status_ref() {
             let http_status = e.status().unwrap();
-            return Err(Error::FCM(format!(
-                "error code {} ({}): {}",
+            return Err(Error::FCM(FCMError::from((
                 http_status.as_u16(),
-                http_status.canonical_reason().unwrap(),
-                resp.text().await.map_err(|_| Error::Deserialization)?
-            )));
+                resp.text().await.map_err(|_| Error::Deserialization)?,
+            ))));
         }
 
         return resp.json().await.map_err(|_| Error::Deserialization);
