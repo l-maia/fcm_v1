@@ -23,7 +23,7 @@ mod result;
 pub mod webpush;
 
 pub use client::Client;
-pub use result::{Error, Result};
+pub use result::{Error, FCMError, Result};
 
 #[cfg(test)]
 mod tests {
